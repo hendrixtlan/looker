@@ -2,8 +2,9 @@
 # Autor: José Israel Maldonado
 # Julio de 2024
 #El siguiente código muestra como generar una url embebida
-#para una instancia de Looker
-#un prerrequisito es generar dentro de Looker en el apartado Admin
+#para una instancia de Looker Platform
+#un prerrequisito para usar este código ejemplo 
+#es generar dentro de Looker Platform en el apartado Admin
 #la API key para poder conectarse a la instancia
 #iniciamos instalando el sdk
 !pip install looker_sdk
@@ -29,6 +30,7 @@ url= 'https://nombre_de_la_instancia.cloud.looker.com/looks/'
 numero_de_dashboard_o_look='9'
 
 #podemos agregar los parámetros por ejemplo algún theme que hayamos creado o bien los filtros
+#el theme que existe por defecto es el de 'Looker'
 parametros='?theme=Looker&filtro1=valor1&filtro2=valor2'
 url=url+numero_de_dashboard_o_look+parametros
 
