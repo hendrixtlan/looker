@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <title>Looker Embed</title>
+</head>
+<body>
+
+  <div id="looker-embed-container"></div> 
+
+  <script type="module">
+    import * as looker from 'https://cdn.jsdelivr.net/npm/@looker/embed-sdk@2.4.0';
+
+    // Reemplaza con tus credenciales
+    const clientId = "your_client_id";
+    const clientSecret = "your_client_secret";
+
+    // Configurar la URL del dashboard que quieres embeber
+    const embedUrl = 'https://lookerceramp.cloud.looker.com'; // Reemplazar con la URL de tu instancia
+    const dashboardUrl = '/embed/dashboards/342'; // Reemplazar con la URL del dashboard
+
+    // Inicializar el SDK de Looker Embed
+    looker.initForLookerEmbedSdk(embedUrl);
+
+    // Crear el iframe embebido
+    looker.createEmbedIframe({
+      url: `${embedUrl}${dashboardUrl}`,
+      clientId: clientId,
+      clientSecret: clientSecret,
+      sessionLength: 30000,
+      externalUserId: '2',
+      permissions: [
+        "access_data",
+        "see_looks",
+        "see_user_dashboards",
+        "see_lookml_dashboards",
+        "download_with_limit",
+        "schedule_look_emails",
+        "schedule_external_look_emails",
+        "create_alerts",
+        "see_drill_overlay",
+        "save_content",
+        "embed_browse_spaces",
+        "schedule_look_emails",
+        "send_to_sftp",
+        "send_to_s3",
+        "send_outgoing_webhook",
+        "send_to_integration",
+        "download_without_limit",
+        "explore",
+        "see_sql"
+      ],
+      models: ['nombre-modelo'] // Reemplazar con el nombre de tu modelo
+    })
+    .then((iframe) => {
+      // Añadir el iframe al elemento contenedor en tu página web
+      iframe.appendTo('#looker-embed-container');
+    })
+    .catch((error) => {
+      // Manejar errores
+      console.error('Error al crear el iframe embebido:', error);
+    });
+  </script>
+
+</body>
+</html>
