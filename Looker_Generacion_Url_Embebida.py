@@ -7,8 +7,10 @@
 #es generar dentro de Looker Platform en el apartado Admin
 #la API key para poder conectarse a la instancia
 #iniciamos instalando el sdk
-# 16 Oct 2024 intentar instalar una versión previa para evitar el error al importar looker_sdk
-!pip install looker-sdk==23.2.0
+# 16 Oct 2024 es posible instalar una versión previa si se experimentan errores al importar looker_sdk
+# !pip install looker-sdk==23.2.0
+# 12 Dic 2024 usar la versión más reciernte del looker_sdk
+!pip install looker-sdk
 import looker_sdk
 import os
 import json
