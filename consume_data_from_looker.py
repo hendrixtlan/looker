@@ -16,9 +16,9 @@ import pprint
 import pandas as pd
 # The credentials will help us connect to the instance, it is recommended to use an ini file
 # since this is just a simple example, we include the credentials in the same code
-os.environ['LOOKERSDK_BASE_URL'] = 'https://nombre_de_la_instancia.cloud.looker.com'
-os.environ['LOOKERSDK_CLIENT_ID'] = 'el_id_de_la_key'
-os.environ['LOOKERSDK_CLIENT_SECRET'] = 'secreto'
+os.environ['LOOKERSDK_BASE_URL'] = 'https://name_looker_instance.cloud.looker.com'
+os.environ['LOOKERSDK_CLIENT_ID'] = 'client_id'
+os.environ['LOOKERSDK_CLIENT_SECRET'] = 'secret'
 # After initializing the Sdk
 sdk = looker_sdk.init40()
 # To consume data from a look it is important to use the Look's id and
