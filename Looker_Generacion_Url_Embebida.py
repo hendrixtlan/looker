@@ -24,9 +24,11 @@ os.environ['LOOKERSDK_CLIENT_SECRET'] = 'secreto'
 #Primero inicializamos el SDK
 sdk = looker_sdk.init40()
 
-#ajustar las siguientes líneas dependiendo si lo que queremos usar son Looks o Dashboards
+#ajustar las siguientes líneas dependiendo si lo que queremos usar son Looks o Dashboards o Conversaciones
 #cuando deseamos crear una url para embeber un dashboard es necesario añadir /embed/dashboards/ a la url base 
 #url= 'https://nombre_de_la_instancia.cloud.looker.com/embed/dashboards/'
+#para las conversaciones el prerrequisito es haber habilitado la correspondiente sección en Admin - Gemini in Looker - Conversational Analytics
+#url= 'https://nombre_de_la_instancia.cloud.looker.com/embed/conversations/'
 #cuando lo que buscamos es generar una url para embeber una look, únicamente necesitamos añadir /looks/ a la url base
 url= 'https://nombre_de_la_instancia.cloud.looker.com/looks/'
 
