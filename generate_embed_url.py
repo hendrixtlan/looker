@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
 # Author: Jose Maldonado
 # July 2026
-# The following code shows how to generate an embedded URL
+# The following code with testing purposes shows how to generate an embedded URL
 # for a Looker Platform instance.
 # A prerequisite to use this example code 
 # is to generate an API key within the Looker Platform in the Admin section
 # to be able to connect to the instance.
 # We start by installing the SDK.
 # October 16, 2024: Try installing a previous version to avoid the error when importing looker_sdk.
-#!pip install looker-sdk==23.2.0
+#!pip install looker-sdk==26.10.0
 import looker_sdk
 import os
 import json
