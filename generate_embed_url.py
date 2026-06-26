@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-# Author: José Israel Maldonado
-# July 2024
+# Author: Jose Maldonado
+# July 2026
 # The following code shows how to generate an embedded URL
 # for a Looker Platform instance.
 # A prerequisite to use this example code 
