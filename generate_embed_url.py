@@ -20,12 +20,18 @@ os.environ['LOOKERSDK_CLIENT_ID'] = 'key_id'
 os.environ['LOOKERSDK_CLIENT_SECRET'] = 'secret'
 # First, we initialize the SDK.
 sdk = looker_sdk.init40()
-# Adjust the following lines depending on whether you want to use Looks or Dashboards.
-# When you want to create a URL to embed a dashboard, it is necessary to add /embed/dashboards/ to the base URL. 
+# Adjust the following lines depending on whether you want to embed a Look, a Dashboard, a Conversation, or an Agent.
+# To embed a dashboard, add /embed/dashboards/ to the base URL.
 # url = 'https://instance_name.cloud.looker.com/embed/dashboards/'
-# When you are looking to generate a URL to embed a Look, you only need to add /looks/ to the base URL.
-url= 'https://instance_name.cloud.looker.com/looks/'
-# The ID of the dashboard or look
+# For Conversational Analytics conversations, the prerequisite is to enable the
+# corresponding section under Admin > Gemini in Looker > Conversational Analytics.
+# url = 'https://instance_name.cloud.looker.com/embed/conversations/'
+# For the Conversational Analytics Agents page, use /embed/agents (same Gemini in
+# Looker prerequisite). This is the Agents page, so no trailing ID is appended.
+# url = 'https://instance_name.cloud.looker.com/embed/agents'
+# To embed a Look, you only need to add /looks/ to the base URL.
+url = 'https://instance_name.cloud.looker.com/looks/'
+# The ID of the dashboard or look (not needed for the Agents page)
 dashboard_or_look_id = '9'
 
 # We can add parameters, for example, a theme that we have created or filters.
