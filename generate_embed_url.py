@@ -8,7 +8,7 @@
 # to be able to connect to the instance.
 # We start by installing the SDK.
 # October 16, 2024: Try installing a previous version to avoid the error when importing looker_sdk.
-!pip install looker-sdk==23.2.0
+#!pip install looker-sdk==23.2.0
 import looker_sdk
 import os
 import json
