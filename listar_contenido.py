@@ -1,66 +1,81 @@
 # -*- coding: utf-8 -*-
-#El siguiente código busca la carpeta llamada 'reporting'
-#en una instancia de Looker Platform y lista su contenido
-#(subcarpetas, dashboards y looks)
-#un prerrequisito para usar este código ejemplo
-#es generar dentro de Looker Platform en el apartado Admin
-#la API key para poder conectarse a la instancia
+#Respaldo de la carpeta 'reporting' de Looker Platform usando gzr (Gazer)
+#TODO EN UN ÚNICO ARCHIVO pensado para correr en Google Colab:
+#las líneas que comienzan con ! son comandos de terminal que Colab
+#ejecuta automáticamente (igual que el !pip install de los otros ejemplos)
 
-#iniciamos instalando el sdk
-!pip install looker-sdk
+#=============================================================
+#CONFIGURACIÓN: esta es la ÚNICA sección que debes editar
+#=============================================================
+INSTANCIA      = 'nombre_de_la_instancia.cloud.looker.com'  #sin https://
+CLIENT_ID      = 'el_id_de_la_key'
+CLIENT_SECRET  = 'secreto'
+NOMBRE_CARPETA = 'reporting'  #la carpeta a respaldar, se busca por nombre
+ID_CARPETA     = ''           #opcional: si ya conoces el id ponlo aquí y se omite la búsqueda
+#=============================================================
 
-import looker_sdk
+#--- 1. instalamos las herramientas: Ruby + gzr, y el SDK de Python ---
+#el gem se llama 'gazer' pero el comando que instala es 'gzr'
+!apt-get -qq install ruby-full > /dev/null
+!gem install gazer
+!gzr --version
+!pip install -q looker-sdk
+
+#--- 2. credenciales (tomadas de la configuración de arriba) ---
+#el SDK de Python las lee de variables de entorno
 import os
+os.environ['LOOKERSDK_BASE_URL'] = f'https://{INSTANCIA}'
+os.environ['LOOKERSDK_CLIENT_ID'] = CLIENT_ID
+os.environ['LOOKERSDK_CLIENT_SECRET'] = CLIENT_SECRET
 
-#las credenciales nos ayudarán a conectarnos a la instancia, se recomienda usar un ini file
-#ya que este solo es un ejemplo sencillo, incluimos las credenciales en el mismo código
-os.environ['LOOKERSDK_BASE_URL'] = 'https://nombre_de_la_instancia.cloud.looker.com'
-os.environ['LOOKERSDK_CLIENT_ID'] = 'el_id_de_la_key'
-os.environ['LOOKERSDK_CLIENT_SECRET'] = 'secreto'
+#gzr las lee del archivo ~/.netrc, lo generamos con las mismas variables
+with open('/root/.netrc', 'w') as f:
+    f.write(f"machine {INSTANCIA}\n  login {CLIENT_ID}\n  password {CLIENT_SECRET}\n")
+!chmod 600 /root/.netrc
 
-#Primero inicializamos el SDK
+#--- 3. ubicamos la carpeta por nombre usando el SDK ---
+import looker_sdk
 sdk = looker_sdk.init40()
 
-#buscamos la carpeta por su nombre
-#equivale a la llamada GET /api/4.0/folders/search?name=reporting
-carpetas = sdk.search_folders(name='reporting', fields='id,name,parent_id')
+if ID_CARPETA == '':
+    carpetas = sdk.search_folders(name=NOMBRE_CARPETA, fields='id,name,parent_id')
+    #si no hay coincidencia exacta probamos con comodines
+    if len(carpetas) == 0:
+        carpetas = sdk.search_folders(name=f'%{NOMBRE_CARPETA}%', fields='id,name,parent_id')
+    if len(carpetas) == 0:
+        raise SystemExit(f"No se encontró ninguna carpeta llamada '{NOMBRE_CARPETA}'")
+    for c in carpetas:
+        print(f"Encontrada: {c.name} (id {c.id}, carpeta padre {c.parent_id})")
+    #usamos la primera coincidencia; si hay varias y no es la correcta,
+    #copia el id correcto en ID_CARPETA en la sección de configuración
+    ID_CARPETA = str(carpetas[0].id)
 
-#si no hay coincidencia exacta, probamos con comodines (%)
-#por si el nombre real es por ejemplo 'Reporting Ventas'
-if len(carpetas) == 0:
-    carpetas = sdk.search_folders(name='%reporting%', fields='id,name,parent_id')
+print(f"\nSe respaldará la carpeta id {ID_CARPETA} de {INSTANCIA}")
 
-if len(carpetas) == 0:
-    print("No se encontró ninguna carpeta llamada 'reporting'")
-    print("Revisa el nombre o los permisos del usuario de la API key")
+#--- 4. vemos el árbol de la carpeta antes de exportar ---
+#nota: en gzr las carpetas se llaman 'space' (el nombre antiguo de folders)
+#nota: --port 443 es necesario en instancias .cloud.looker.com
+!gzr space tree {ID_CARPETA} --host {INSTANCIA} --port 443
 
-#puede existir más de una carpeta con el mismo nombre
-#(por ejemplo en espacios personales de distintos usuarios)
-#por eso recorremos todas las coincidencias
-for carpeta in carpetas:
-    print("=" * 60)
-    print(f"Carpeta: {carpeta.name} (id {carpeta.id}, carpeta padre {carpeta.parent_id})")
+#--- 5. exportamos la carpeta completa ---
+#descarga la carpeta, sus subcarpetas y el JSON de cada dashboard y look
+!gzr space export {ID_CARPETA} --dir ./respaldo_gzr --host {INSTANCIA} --port 443
 
-    #listamos las subcarpetas
-    #equivale a la llamada GET /api/4.0/folders/{folder_id}/children
-    subcarpetas = sdk.folder_children(folder_id=carpeta.id, fields='id,name')
-    print("\nSubcarpetas:")
-    for sub in subcarpetas:
-        print(f"  {sub.id} - {sub.name}")
+#revisamos lo que se descargó y lo comprimimos para bajarlo de Colab
+!find ./respaldo_gzr -type f | head -50
+!zip -q -r respaldo_gzr.zip respaldo_gzr
+print("\nListo: revisa la carpeta ./respaldo_gzr y el archivo respaldo_gzr.zip")
 
-    #listamos los dashboards que contiene la carpeta
-    #equivale a la llamada GET /api/4.0/folders/{folder_id}/dashboards
-    dashboards = sdk.folder_dashboards(folder_id=carpeta.id, fields='id,title')
-    print("\nDashboards:")
-    for d in dashboards:
-        print(f"  {d.id} - {d.title}")
+#--- extras útiles (descomenta la línea si la necesitas) ---
+#exportar un solo dashboard o look como JSON:
+#!gzr dashboard cat 123 --host {INSTANCIA} --port 443
+#!gzr look cat 45 --host {INSTANCIA} --port 443
 
-    #listamos los looks que contiene la carpeta
-    #equivale a la llamada GET /api/4.0/folders/{folder_id}/looks
-    looks = sdk.folder_looks(folder_id=carpeta.id, fields='id,title')
-    print("\nLooks:")
-    for lk in looks:
-        print(f"  {lk.id} - {lk.title}")
+#re-importar el respaldo en otra carpeta u otra instancia:
+#!gzr space import ./respaldo_gzr/nombre_carpeta <id_carpeta_destino> --host otra_instancia.cloud.looker.com --port 443
 
-#nota: el usuario asociado a la API key solo verá las carpetas
-#a las que tiene acceso según sus permisos en Looker
+#notas:
+#- si 'gem install gazer' falla por la versión de Ruby, instala una más
+#  reciente (por ejemplo con rbenv o rvm) y reintenta
+#- gzr y el SDK respetan los permisos del usuario de la API key:
+#  solo se exporta lo que ese usuario puede ver
